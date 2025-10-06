@@ -1,7 +1,18 @@
 import React, { useState } from "react";
+import FeedbackModal from "./FeedbackModal";
 
 function ChatWindow({ selectedChat, onSend }) {
   const [input, setInput] = useState("");
+  const [hoveredMessageIndex, setHoveredMessageIndex] = useState(null);
+  const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: null });
+
+  const handleFeedback = (type) => {
+    setFeedbackModal({ isOpen: true, type });
+  };
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+  };
 
   if (!selectedChat) {
     return <div style={styles.empty}>Select or start a new chat...</div>;
@@ -11,15 +22,51 @@ function ChatWindow({ selectedChat, onSend }) {
     <div style={styles.chatWindow}>
       <div style={styles.messages}>
         {selectedChat.messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              ...styles.message,
-              alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-              backgroundColor: msg.sender === "user" ? "#74b9ff" : "#dfe6e9",
-            }}
-          >
-            {msg.text}
+          <div key={i} style={styles.messageContainer}>
+            <div style={styles.messageContent}>
+              <div style={styles.messageHeader}>
+                <span style={styles.senderIcon}>
+                  {msg.sender === "user" ? "👤" : "💬"}
+                </span>
+                <span style={styles.senderLabel}>
+                  {msg.sender === "user" ? "YOU" : "Naffa3"}
+                </span>
+              </div>
+              <div
+                style={styles.messageBubbleWrapper}
+                onMouseEnter={() => msg.sender === "bot" && setHoveredMessageIndex(i)}
+                onMouseLeave={() => msg.sender === "bot" && setHoveredMessageIndex(null)}
+              >
+                {msg.sender === "bot" && hoveredMessageIndex === i && (
+                  <div style={styles.actionButtons}>
+                    <button
+                      style={styles.actionButton}
+                      onClick={() => handleFeedback("up")}
+                      title="Thumbs up"
+                    >
+                      👍
+                    </button>
+                    <button
+                      style={styles.actionButton}
+                      onClick={() => handleFeedback("down")}
+                      title="Thumbs down"
+                    >
+                      👎
+                    </button>
+                    <button
+                      style={styles.actionButton}
+                      onClick={() => handleCopy(msg.text)}
+                      title="Copy"
+                    >
+                      📋
+                    </button>
+                  </div>
+                )}
+                <div style={styles.messageBubble}>
+                  <div style={styles.messageText}>{msg.text}</div>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -39,6 +86,12 @@ function ChatWindow({ selectedChat, onSend }) {
           Send
         </button>
       </div>
+
+      <FeedbackModal
+        isOpen={feedbackModal.isOpen}
+        onClose={() => setFeedbackModal({ isOpen: false, type: null })}
+        feedbackType={feedbackModal.type}
+      />
     </div>
   );
 }
@@ -48,38 +101,103 @@ const styles = {
     flex: 1,
     display: "flex",
     flexDirection: "column",
-    padding: "20px",
+    backgroundColor: "#e8eaed",
+    overflowX: "hidden",
   },
   messages: {
     flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
     overflowY: "auto",
-    marginBottom: "10px",
+    overflowX: "hidden",
   },
-  message: {
-    padding: "10px",
-    borderRadius: "10px",
-    maxWidth: "60%",
+  messageContainer: {
+    width: "100%",
+    padding: "20px 60px",
+  },
+  messageContent: {
+    maxWidth: "800px",
+    margin: "0 auto",
+  },
+  messageHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    marginBottom: "8px",
+  },
+  senderIcon: {
+    fontSize: "12px",
+  },
+  senderLabel: {
+    fontSize: "12px",
+    fontWeight: "600",
+    color: "#5f6368",
+    textTransform: "uppercase",
+    letterSpacing: "0.3px",
+  },
+  messageBubbleWrapper: {
+    position: "relative",
+  },
+  messageBubble: {
+    backgroundColor: "white",
+    borderRadius: "12px",
+    padding: "16px 20px",
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+  },
+  messageText: {
+    fontSize: "14px",
+    lineHeight: "1.6",
+    color: "#202124",
+  },
+  actionButtons: {
+    position: "absolute",
+    top: "-24px",
+    right: "12px",
+    display: "flex",
+    gap: "4px",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "4px 8px",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+  },
+  actionButton: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "14px",
+    padding: "2px 4px",
+    opacity: 0.8,
+    transition: "opacity 0.2s",
   },
   inputBox: {
+    padding: "20px 60px 30px",
+    backgroundColor: "#e8eaed",
     display: "flex",
-    gap: "10px",
+    gap: "12px",
+    maxWidth: "800px",
+    margin: "0 auto",
+    width: "100%",
+    boxSizing: "border-box",
   },
   input: {
     flex: 1,
-    padding: "10px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
+    padding: "14px 18px",
+    border: "none",
+    borderRadius: "24px",
+    fontSize: "14px",
+    outline: "none",
+    backgroundColor: "white",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+    resize: "none",
   },
   button: {
-    padding: "10px 15px",
-    background: "#0984e3",
+    padding: "14px 28px",
+    background: "#1a73e8",
     color: "white",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "24px",
     cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
   },
   empty: {
     flex: 1,
@@ -87,6 +205,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     color: "#636e72",
+    backgroundColor: "#e8eaed",
   },
 };
 

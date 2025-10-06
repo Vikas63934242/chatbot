@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Sidebar from './components/Sidebar';
+import Header from './components/Header';
 import React, { useState } from "react";
 import ChatWindow from "./components/ChatWindow";
 
@@ -20,6 +21,25 @@ function App() {
 
   const handleSelectChat = (index) => {
     setSelectedIndex(index);
+  };
+  // Edit chat title
+  const handleEditChat = (index, newTitle) => {
+    const updatedChats = chats.map((chat, i) =>
+      i === index ? { ...chat, title: newTitle } : chat
+    );
+    setChats(updatedChats);
+  };
+
+  // Delete chat
+  const handleDeleteChat = (index) => {
+    const updatedChats = chats.filter((_, i) => i !== index);
+    setChats(updatedChats);
+    // Adjust selectedIndex if needed
+    if (selectedIndex === index) {
+      setSelectedIndex(null);
+    } else if (selectedIndex > index) {
+      setSelectedIndex(selectedIndex - 1);
+    }
   };
 
   const handleSend = async (input, resetInput) => {
@@ -53,24 +73,35 @@ function App() {
   };
 
   return (
-    <div style={styles.container}>
-      <Sidebar
-        chats={chats}
-        onNewChat={handleNewChat}
-        onSelectChat={handleSelectChat}
-      />
-      <ChatWindow
-        selectedChat={chats[selectedIndex]}
-        onSend={handleSend}
-      />
+    <div style={styles.appContainer}>
+      <Header botName="Naffa3" />
+      <div style={styles.container}>
+        <Sidebar
+          chats={chats}
+          onNewChat={handleNewChat}
+          onSelectChat={handleSelectChat}
+          onEditChat={handleEditChat}
+          onDeleteChat={handleDeleteChat}
+        />
+        <ChatWindow
+          selectedChat={chats[selectedIndex]}
+          onSend={handleSend}
+        />
+      </div>
     </div>
   );
 }
 
 const styles = {
+  appContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+  },
   container: {
     display: "flex",
-    height: "100vh",
+    flex: 1,
+    overflow: "hidden",
   },
 };
 
