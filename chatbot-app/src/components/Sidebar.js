@@ -1,8 +1,9 @@
 import React from "react";
 import { useState } from "react";
 
-function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat  }) {
-  const [editIndex, setEditIndex] = useState(null);
+function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, selectedChat }) {
+ console.log({chats});
+  const [editChat, setEditChat] = useState(null);
   const [editValue, setEditValue] = useState("");
     const isToday = (date) => {
       const today = new Date();
@@ -15,41 +16,44 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat  })
 
     const todayChats = chats.filter(chat => isToday(new Date(chat.createdAt)));
     const olderChats = chats.filter(chat => !isToday(new Date(chat.createdAt)));
-    const handleEdit = (index, chat) => {
-    setEditIndex(index);
+    const handleEdit = (chat) => {
     setEditValue(chat.title);
+    setEditChat(chat.chatId);
     };
 
-    const handleEditSave = (index) => {
-        onEditChat(index, editValue);
-        setEditIndex(null);
+    const handleEditSave = (chatId) => {
+        onEditChat(chatId, editValue);
         setEditValue("");
+        setEditChat(null);
     };
   return (
     <div style={styles.sidebar}>
       <button style={styles.newChatBtn} onClick={onNewChat}>
         + New Chat
       </button>
-
        <div style={styles.chatList}>
         <h4>Today</h4>
-        {todayChats.map((chat, i) => (
-          <div key={i} style={styles.chatItem} >
-            {editIndex === i ? (
+        {[...todayChats].reverse().map((chat, i) => (
+          <div key={i} style={{
+                                                                  ...styles.chatItem,
+                                                                  background: chat.chatId === selectedChat.chatId ? "#1e90ff" : "#57606f",
+                                                                  color: chat.chatId === selectedChat.chatId ? "white" : "white",
+                                                                }} >
+            {editChat === chat.chatId ? (
               <>
                 <input
                   value={editValue}
                   onChange={e => setEditValue(e.target.value)}
                   style={styles.input}
                 />
-                <button onClick={() => handleEditSave(i)} style={styles.iconBtn}>💾</button>
-                <button onClick={() => setEditIndex(null)} style={styles.iconBtn}>✖</button>
+                <button onClick={() => handleEditSave(chat.chatId)} style={styles.iconBtn}>💾</button>
+                <button onClick={() => setEditChat(null)} style={styles.iconBtn}>✖</button>
               </>
             ) : (
               <>
-                <span onClick={() => onSelectChat(i)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
-                <button onClick={() => handleEdit(i, chat)} style={styles.iconBtn}>✏️</button>
-                <button onClick={() => onDeleteChat(i)} style={styles.iconBtn}>🗑️</button>
+                <span onClick={() => onSelectChat(chat.chatId)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
+                <button onClick={() => handleEdit(chat)} style={styles.iconBtn}>✏️</button>
+                <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn}>🗑️</button>
               </>
             )
         }
@@ -57,23 +61,27 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat  })
         ))}
 
         <h4>Older</h4>
-        {olderChats.map((chat, i) => (
-          <div key={i} style={styles.chatItem}>
-            {editIndex === i + todayChats.length ? (
+        {[...olderChats].reverse().map((chat, i) => (
+          <div key={i} style={{
+                                     ...styles.chatItem,
+                                     background: chat.chatId === selectedChat.chatId ? "#1e90ff" : "#57606f",
+                                     color: chat.chatId === selectedChat.chatId ? "white" : "white",
+                                   }}>
+            {editChat === chat.chatId ? (
               <>
                 <input
                   value={editValue}
                   onChange={e => setEditValue(e.target.value)}
                   style={styles.input}
                 />
-                <button onClick={() => handleEditSave(i + todayChats.length)} style={styles.iconBtn}>💾</button>
-                <button onClick={() => setEditIndex(null)} style={styles.iconBtn}>✖</button>
+                <button onClick={() => handleEditSave(chat.chatId)} style={styles.iconBtn}>💾</button>
+                <button onClick={() => setEditChat(null)} style={styles.iconBtn}>✖</button>
               </>
             ) : (
               <>
-                <span onClick={() => onSelectChat(i + todayChats.length)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
-                <button onClick={() => handleEdit(i + todayChats.length, chat)} style={styles.iconBtn}>✏️</button>
-                <button onClick={() => onDeleteChat(i + todayChats.length)} style={styles.iconBtn}>🗑️</button>
+                <span onClick={() => onSelectChat(chat.chatId)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
+                <button onClick={() => handleEdit(chat)} style={styles.iconBtn}>✏️</button>
+                <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn}>🗑️</button>
               </>
             )}
           </div>

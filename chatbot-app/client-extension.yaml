@@ -1,0 +1,16 @@
+assemble:
+  - from: build/static
+    into: static
+    
+chat-bot:
+  cssURLs:
+    - css/main.*.css
+  friendlyURLMapping: chatbot-app
+  htmlElementName: chatbot-app
+  instanceable: true
+  name: Chat Bot
+  portletCategoryName: category.client-extensions
+  type: customElement
+  urls:
+    - js/main.*.js
+  useESM: true
