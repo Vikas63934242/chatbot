@@ -1,13 +1,51 @@
 import React, { useState } from "react";
 
-function FeedbackModal({ isOpen, onClose, feedbackType }) {
+function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
   const [feedbackText, setFeedbackText] = useState("");
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
-    // Handle feedback submission here
-    console.log("Feedback submitted:", { type: feedbackType, text: feedbackText });
+  const handleSubmit = async () => {
+        try {
+            const response = await fetch(
+                        `http://localhost:8080/o/c/chatmessages/${msgId}`,
+                      {
+                        method: "GET",
+                        headers: {
+                          accept: "application/json",
+                          "x-csrf-token": 'H6GryH4k',
+                          "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
+                          "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
+
+                        },
+                      }
+                    );
+            const data = await response.json();
+            await fetch(`http://localhost:8080/o/c/chatmessages/${msgId}`,  {
+              method: "PUT",
+              headers: {
+                accept: "application/json",
+                "Content-Type": "application/json",
+                "x-csrf-token": "H6GryH4k",
+                "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
+                "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
+              },
+              body: JSON.stringify({
+               chatID: data.chatID,
+               feedback: feedbackText,
+               feedbackReaction: feedbackType,
+               messageText: data.messageText,
+               messageType: {
+                 key: "bot",
+                 name: "bot"
+               },
+               r_chatUserID_userId: data.r_chatUserID_userId,
+               createdAt: data.createdAt
+              })
+            });
+          } catch (err) {
+            console.error("Error creating user-chat mapping:", err);
+          }
     setFeedbackText("");
     onClose();
   };

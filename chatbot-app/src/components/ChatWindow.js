@@ -4,10 +4,10 @@ import FeedbackModal from "./FeedbackModal";
 function ChatWindow({ selectedChat, onSend }) {
   const [input, setInput] = useState("");
   const [hoveredMessageIndex, setHoveredMessageIndex] = useState(null);
-  const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: null });
+  const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: null, id: null });
 
-  const handleFeedback = (type) => {
-    setFeedbackModal({ isOpen: true, type });
+  const handleFeedback = (type, id) => {
+    setFeedbackModal({ isOpen: true, type, id });
   };
 
   const handleCopy = (text) => {
@@ -41,14 +41,14 @@ function ChatWindow({ selectedChat, onSend }) {
                   <div style={styles.actionButtons}>
                     <button
                       style={styles.actionButton}
-                      onClick={() => handleFeedback("up")}
+                      onClick={() => handleFeedback("up", msg.id)}
                       title="Thumbs up"
                     >
                       👍
                     </button>
                     <button
                       style={styles.actionButton}
-                      onClick={() => handleFeedback("down")}
+                      onClick={() => handleFeedback("down"), msg.id}
                       title="Thumbs down"
                     >
                       👎
@@ -89,8 +89,9 @@ function ChatWindow({ selectedChat, onSend }) {
 
       <FeedbackModal
         isOpen={feedbackModal.isOpen}
-        onClose={() => setFeedbackModal({ isOpen: false, type: null })}
+        onClose={() => setFeedbackModal({ isOpen: false, type: null, id: null })}
         feedbackType={feedbackModal.type}
+        msgId={feedbackModal.id}
       />
     </div>
   );
