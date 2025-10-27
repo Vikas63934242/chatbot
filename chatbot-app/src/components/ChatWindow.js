@@ -48,7 +48,7 @@ function ChatWindow({ selectedChat, onSend }) {
                     </button>
                     <button
                       style={styles.actionButton}
-                      onClick={() => handleFeedback("down"), msg.id}
+                      onClick={() => handleFeedback("down", msg.id)}
                       title="Thumbs down"
                     >
                       👎
