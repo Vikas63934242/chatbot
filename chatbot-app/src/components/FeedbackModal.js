@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import Loader from "./Loader";
+import { useLoader } from "../hooks/useLoader";
 
 function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
   const [feedbackText, setFeedbackText] = useState("");
+  const feedbackLoader = useLoader();
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
+    await feedbackLoader.withLoader(async () => {
         try {
             const response = await fetch(
                         `http://localhost:8080/o/c/chatmessages/${msgId}`,
@@ -46,8 +50,9 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
           } catch (err) {
             console.error("Error creating user-chat mapping:", err);
           }
-    setFeedbackText("");
-    onClose();
+      setFeedbackText("");
+      onClose();
+    });
   };
 
   return (
@@ -63,9 +68,21 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
           value={feedbackText}
           onChange={(e) => setFeedbackText(e.target.value)}
           placeholder="Type your feedback here..."
+          disabled={feedbackLoader.loading}
         />
-        <button style={styles.submitButton} onClick={handleSubmit}>
-          Submit
+        <button
+          style={{...styles.submitButton, opacity: feedbackLoader.loading ? 0.6 : 1}}
+          onClick={handleSubmit}
+          disabled={feedbackLoader.loading}
+        >
+          {feedbackLoader.loading ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Loader size="small" />
+              <span>Submitting...</span>
+            </div>
+          ) : (
+            "Submit"
+          )}
         </button>
       </div>
     </div>

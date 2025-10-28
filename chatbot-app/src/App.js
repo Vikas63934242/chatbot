@@ -4,34 +4,45 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import React, { useState, useEffect } from "react";
 import ChatWindow from "./components/ChatWindow";
+import Loader from './components/Loader';
+import { useLoader } from './hooks/useLoader';
 
 function App() {
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
-  const userId = window.Liferay.ThemeDisplay.getUserId();
+  const userId = window.Liferay?.ThemeDisplay?.getUserId() || 'test@gmail.com';
+
+  // Multiple loaders for different operations
+  const initialLoader = useLoader();
+  const chatSelectLoader = useLoader();
+  const newChatLoader = useLoader();
+  const editChatLoader = useLoader();
+  const deleteChatLoader = useLoader();
+  const sendMessageLoader = useLoader();
 
     useEffect( () => {
      async function fetchData() {
-        const items = await getUserChatMappingByChatId("r_userIdChat_userId" , userId);
-        const oldChat = items ? items.map(item =>
-        ({     title: item.chatTitle,
-                chatId: item.chatId,
-                createdAt: item.createdAt,
-              messages: []
-        })) : [];
-        let storedChats = JSON.parse(sessionStorage.getItem('chat'));
-        let baseChats = chats;
-        if(oldChat && oldChat.length > 0){
-            baseChats=oldChat;
-        }
-        setChats(baseChats);
-        if(storedChats){
-            setSelectedChat(storedChats);
-            sessionStorage.setItem('chat', JSON.stringify(storedChats));
-        }else{
-            handleNewChat(baseChats);
-        }
-
+        await initialLoader.withLoader(async () => {
+          const items = await getUserChatMappingByChatId("r_userIdChat_userId" , userId);
+          const oldChat = items ? items.map(item =>
+          ({     title: item.chatTitle,
+                  chatId: item.chatId,
+                  createdAt: item.createdAt,
+                messages: []
+          })) : [];
+          let storedChats = JSON.parse(sessionStorage.getItem('chat'));
+          let baseChats = chats;
+          if(oldChat && oldChat.length > 0){
+              baseChats=oldChat;
+          }
+          setChats(baseChats);
+          if(storedChats){
+              setSelectedChat(storedChats);
+              sessionStorage.setItem('chat', JSON.stringify(storedChats));
+          }else{
+              handleNewChat(baseChats);
+          }
+        });
       }
       fetchData();
     }, [userId]);
@@ -225,96 +236,112 @@ function App() {
       };
 
   const handleNewChat = async (baseChats) => {
-    const chatId = userId+'-'+ Math.random().toString(36).substring(2, 15);
-    let newChat = {
-      title: chatId,
-      chatId: chatId,
-      messages: [],
-      createdAt: new Date().toISOString(),
-    };
-    createUserChatMapping(newChat, "", "POST");
-    let msgId = await addMessageIntoObject("bot", "Hello! How can I help you?", chatId);
-    newChat = {...newChat,
-    messages: [{ sender: "bot", text: "Hello! How can I help you?", id: msgId }]
-    };
-    setSelectedChat(newChat);
-    if(baseChats && baseChats.length > 0){
-        setChats([...baseChats, newChat]);
-    }else{
-        setChats([...chats, newChat]);
-    }
-    sessionStorage.setItem('chat', JSON.stringify(newChat));
+    await newChatLoader.withLoader(async () => {
+      const chatId = userId+'-'+ Math.random().toString(36).substring(2, 15);
+      let newChat = {
+        title: chatId,
+        chatId: chatId,
+        messages: [],
+        createdAt: new Date().toISOString(),
+      };
+      createUserChatMapping(newChat, "", "POST");
+      let msgId = await addMessageIntoObject("bot", "Hello! How can I help you?", chatId);
+      newChat = {...newChat,
+      messages: [{ sender: "bot", text: "Hello! How can I help you?", id: msgId }]
+      };
+      setSelectedChat(newChat);
+      if(baseChats && baseChats.length > 0){
+          setChats([...baseChats, newChat]);
+      }else{
+          setChats([...chats, newChat]);
+      }
+      sessionStorage.setItem('chat', JSON.stringify(newChat));
+    });
   };
 
   const handleSelectChat =  async (chatId) => {
-    const chatToShow = chats.find(chat => chat.chatId === chatId);
-    const items = await getChatMessage(chatId);
-    let messages = [];
-    if (items && items.length > 0) {
-      messages = items.map(item => ({
-        sender: item.messageType?.name || "Unknown",
-        text: item.messageText,
-        createdAt: item.createdAt,
-        id: item.id
-      })).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    }
-    const updatedChat = { ...chatToShow, messages };
-    setSelectedChat(updatedChat);
-    sessionStorage.setItem('chat', JSON.stringify(updatedChat));
+    await chatSelectLoader.withLoader(async () => {
+      const chatToShow = chats.find(chat => chat.chatId === chatId);
+      const items = await getChatMessage(chatId);
+      let messages = [];
+      if (items && items.length > 0) {
+        messages = items.map(item => ({
+          sender: item.messageType?.name || "Unknown",
+          text: item.messageText,
+          createdAt: item.createdAt,
+          id: item.id
+        })).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      }
+      const updatedChat = { ...chatToShow, messages };
+      setSelectedChat(updatedChat);
+      sessionStorage.setItem('chat', JSON.stringify(updatedChat));
+    });
   };
   // Edit chat title
   const handleEditChat = async (chatId, newTitle) => {
-  const updatedChats = chats.map(chat =>
-    chat.chatId === chatId ? { ...chat, title: newTitle } : chat
-  );
-  setChats(updatedChats);
-  const updatedChat = updatedChats.find(chat => chat.chatId === chatId);
-  if (updatedChat) {
-    const id = await getUserChatMappingByChatId("chatId" , chatId);
-    createUserChatMapping(updatedChat, id , "PUT");
-  }
+    await editChatLoader.withLoader(async () => {
+      const updatedChats = chats.map(chat =>
+        chat.chatId === chatId ? { ...chat, title: newTitle } : chat
+      );
+      setChats(updatedChats);
+      const updatedChat = updatedChats.find(chat => chat.chatId === chatId);
+      if (updatedChat) {
+        const id = await getUserChatMappingByChatId("chatId" , chatId);
+        createUserChatMapping(updatedChat, id , "PUT");
+      }
+    });
   };
 
   // Delete chat
   const handleDeleteChat = async (chatId) => {
-    const id = await getUserChatMappingByChatId("chatId" , chatId);
-    await deleteUserChatMapping(id);
-    const items = await getChatMessage(chatId);
-    const idArray = (items && items.length > 0)
-      ? items.map(item => ({ id: item.id }))
-      : [];
-    deleteChatMessages(idArray);
-    sessionStorage.clear();
-    const updatedChats = chats.filter(chat => chat.chatId !== chatId);
-    setChats(updatedChats);
-    if(selectedChat && selectedChat.chatId === chatId){
-        setSelectedChat(null);
-    }
+    await deleteChatLoader.withLoader(async () => {
+      const id = await getUserChatMappingByChatId("chatId" , chatId);
+      await deleteUserChatMapping(id);
+      const items = await getChatMessage(chatId);
+      const idArray = (items && items.length > 0)
+        ? items.map(item => ({ id: item.id }))
+        : [];
+      console.log("idArray to delete messages:", idArray);
+      deleteChatMessages(idArray);
+      sessionStorage.clear();
+      const updatedChats = chats.filter(chat => chat.chatId !== chatId);
+      setChats(updatedChats);
+      if(selectedChat && selectedChat.chatId === chatId){
+          setSelectedChat(null);
+      }
+      console.log("selectedChat", selectedChat);
+    });
   };
 
  const handleSend = async (input, resetInput) => {
    if (!input.trim() || selectedChat === null) return;
-   let userMessageId = await addMessageIntoObject("user", input, selectedChat.chatId);
-   let botMessageId = await addMessageIntoObject("bot", "test response from API", selectedChat.chatId);
-   const newMessages = [
-     ...selectedChat.messages,
-     { sender: "user", text: input, id: userMessageId },
-     { sender: "bot", text: "test response from API", id: botMessageId }
-   ];
-   const updatedChat = { ...selectedChat, messages: newMessages };
-   const updatedChats = chats.map(chat =>
-     chat.chatId === selectedChat.chatId ? updatedChat : chat
-   );
-   setChats(updatedChats);
-   setSelectedChat(updatedChat);
-   sessionStorage.setItem('chat', JSON.stringify(updatedChat));
-   resetInput("");
+   await sendMessageLoader.withLoader(async () => {
+     let userMessageId = await addMessageIntoObject("user", input, selectedChat.chatId);
+     let botMessageId = await addMessageIntoObject("bot", "test response from API", selectedChat.chatId);
+     const newMessages = [
+       ...selectedChat.messages,
+       { sender: "user", text: input, id: userMessageId },
+       { sender: "bot", text: "test response from API", id: botMessageId }
+     ];
+     const updatedChat = { ...selectedChat, messages: newMessages };
+     const updatedChats = chats.map(chat =>
+       chat.chatId === selectedChat.chatId ? updatedChat : chat
+     );
+     setChats(updatedChats);
+     setSelectedChat(updatedChat);
+     sessionStorage.setItem('chat', JSON.stringify(updatedChat));
+     resetInput("");
+   });
  };
 
 
   return (
     <div style={styles.appContainer}>
       <Header botName="Naffa3" />
+      {initialLoader.loading && <Loader overlay={true} message="Loading chats..." />}
+      {newChatLoader.loading && <Loader overlay={true} message="Creating new chat..." />}
+      {editChatLoader.loading && <Loader overlay={true} message="Saving changes..." />}
+      {deleteChatLoader.loading && <Loader overlay={true} message="Deleting chat..." />}
       <div style={styles.container}>
         <Sidebar
           chats={chats}
@@ -323,10 +350,13 @@ function App() {
           onEditChat={handleEditChat}
           onDeleteChat={handleDeleteChat}
           selectedChat={selectedChat}
+          isLoading={chatSelectLoader.loading}
         />
         <ChatWindow
           selectedChat={selectedChat}
           onSend={handleSend}
+          isLoading={sendMessageLoader.loading}
+          isChatLoading={chatSelectLoader.loading}
         />
       </div>
     </div>

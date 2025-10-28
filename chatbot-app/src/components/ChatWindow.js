@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import FeedbackModal from "./FeedbackModal";
+import Loader from "./Loader";
 
-function ChatWindow({ selectedChat, onSend }) {
+function ChatWindow({ selectedChat, onSend, isLoading, isChatLoading }) {
   const [input, setInput] = useState("");
   const [hoveredMessageIndex, setHoveredMessageIndex] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState({ isOpen: false, type: null, id: null });
@@ -21,54 +22,75 @@ function ChatWindow({ selectedChat, onSend }) {
   return (
     <div style={styles.chatWindow}>
       <div style={styles.messages}>
-        {selectedChat.messages.map((msg, i) => (
-          <div key={i} style={styles.messageContainer}>
-            <div style={styles.messageContent}>
-              <div style={styles.messageHeader}>
-                <span style={styles.senderIcon}>
-                  {msg.sender === "user" ? "👤" : "💬"}
-                </span>
-                <span style={styles.senderLabel}>
-                  {msg.sender === "user" ? "YOU" : "Naffa3"}
-                </span>
-              </div>
-              <div
-                style={styles.messageBubbleWrapper}
-                onMouseEnter={() => msg.sender === "bot" && setHoveredMessageIndex(i)}
-                onMouseLeave={() => msg.sender === "bot" && setHoveredMessageIndex(null)}
-              >
-                {msg.sender === "bot" && hoveredMessageIndex === i && (
-                  <div style={styles.actionButtons}>
-                    <button
-                      style={styles.actionButton}
-                      onClick={() => handleFeedback("up", msg.id)}
-                      title="Thumbs up"
-                    >
-                      👍
-                    </button>
-                    <button
-                      style={styles.actionButton}
-                      onClick={() => handleFeedback("down", msg.id)}
-                      title="Thumbs down"
-                    >
-                      👎
-                    </button>
-                    <button
-                      style={styles.actionButton}
-                      onClick={() => handleCopy(msg.text)}
-                      title="Copy"
-                    >
-                      📋
-                    </button>
+        {isChatLoading ? (
+          <div style={styles.loaderContainer}>
+            <Loader message="Loading chat messages..." />
+          </div>
+        ) : (
+          <>
+            {selectedChat.messages.map((msg, i) => (
+              <div key={i} style={styles.messageContainer}>
+                <div style={styles.messageContent}>
+                  <div style={styles.messageHeader}>
+                    <span style={styles.senderIcon}>
+                      {msg.sender === "user" ? "👤" : "💬"}
+                    </span>
+                    <span style={styles.senderLabel}>
+                      {msg.sender === "user" ? "YOU" : "Naffa3"}
+                    </span>
                   </div>
-                )}
-                <div style={styles.messageBubble}>
-                  <div style={styles.messageText}>{msg.text}</div>
+                  <div
+                    style={styles.messageBubbleWrapper}
+                    onMouseEnter={() => msg.sender === "bot" && setHoveredMessageIndex(i)}
+                    onMouseLeave={() => msg.sender === "bot" && setHoveredMessageIndex(null)}
+                  >
+                    {msg.sender === "bot" && hoveredMessageIndex === i && (
+                      <div style={styles.actionButtons}>
+                        <button
+                          style={styles.actionButton}
+                          onClick={() => handleFeedback("up", msg.id)}
+                          title="Thumbs up"
+                        >
+                          👍
+                        </button>
+                        <button
+                          style={styles.actionButton}
+                          onClick={() => handleFeedback("down", msg.id)}
+                          title="Thumbs down"
+                        >
+                          👎
+                        </button>
+                        <button
+                          style={styles.actionButton}
+                          onClick={() => handleCopy(msg.text)}
+                          title="Copy"
+                        >
+                          📋
+                        </button>
+                      </div>
+                    )}
+                    <div style={styles.messageBubble}>
+                      <div style={styles.messageText}>{msg.text}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
+            ))}
+            {isLoading && (
+              <div style={styles.messageContainer}>
+                <div style={styles.messageContent}>
+                  <div style={styles.messageHeader}>
+                    <span style={styles.senderIcon}>💬</span>
+                    <span style={styles.senderLabel}>Naffa3</span>
+                  </div>
+                  <div style={styles.messageBubble}>
+                    <Loader size="small" type="dots" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <div style={styles.inputBox}>
@@ -76,14 +98,16 @@ function ChatWindow({ selectedChat, onSend }) {
           style={styles.input}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onSend(input, setInput)}
+          onKeyDown={(e) => e.key === "Enter" && !isLoading && onSend(input, setInput)}
           placeholder="Type a message..."
+          disabled={isLoading}
         />
         <button
-          style={styles.button}
+          style={{...styles.button, opacity: isLoading ? 0.6 : 1}}
           onClick={() => onSend(input, setInput)}
+          disabled={isLoading}
         >
-          Send
+          {isLoading ? "Sending..." : "Send"}
         </button>
       </div>
 
@@ -207,6 +231,12 @@ const styles = {
     alignItems: "center",
     color: "#636e72",
     backgroundColor: "#e8eaed",
+  },
+  loaderContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
   },
 };
 

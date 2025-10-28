@@ -1,7 +1,8 @@
 import React from "react";
 import { useState } from "react";
+import Loader from "./Loader";
 
-function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, selectedChat }) {
+function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, selectedChat, isLoading }) {
  console.log({chats});
   const [editChat, setEditChat] = useState(null);
   const [editValue, setEditValue] = useState("");
@@ -51,9 +52,15 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, se
               </>
             ) : (
               <>
-                <span onClick={() => onSelectChat(chat.chatId)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
-                <button onClick={() => handleEdit(chat)} style={styles.iconBtn}>✏️</button>
-                <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn}>🗑️</button>
+                <span onClick={() => !isLoading && onSelectChat(chat.chatId)} style={{ flex: 1, cursor: isLoading ? "not-allowed" : "pointer", opacity: isLoading ? 0.6 : 1 }}>{chat.title}</span>
+                {isLoading && chat.chatId === selectedChat?.chatId ? (
+                  <Loader size="small" />
+                ) : (
+                  <>
+                    <button onClick={() => handleEdit(chat)} style={styles.iconBtn} disabled={isLoading}>✏️</button>
+                    <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn} disabled={isLoading}>🗑️</button>
+                  </>
+                )}
               </>
             )
         }
@@ -79,9 +86,15 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, se
               </>
             ) : (
               <>
-                <span onClick={() => onSelectChat(chat.chatId)} style={{ flex: 1, cursor: "pointer" }}>{chat.title}</span>
-                <button onClick={() => handleEdit(chat)} style={styles.iconBtn}>✏️</button>
-                <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn}>🗑️</button>
+                <span onClick={() => !isLoading && onSelectChat(chat.chatId)} style={{ flex: 1, cursor: isLoading ? "not-allowed" : "pointer", opacity: isLoading ? 0.6 : 1 }}>{chat.title}</span>
+                {isLoading && chat.chatId === selectedChat?.chatId ? (
+                  <Loader size="small" />
+                ) : (
+                  <>
+                    <button onClick={() => handleEdit(chat)} style={styles.iconBtn} disabled={isLoading}>✏️</button>
+                    <button onClick={() => onDeleteChat(chat.chatId)} style={styles.iconBtn} disabled={isLoading}>🗑️</button>
+                  </>
+                )}
               </>
             )}
           </div>
