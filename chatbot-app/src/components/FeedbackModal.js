@@ -13,7 +13,7 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
                         method: "GET",
                         headers: {
                           accept: "application/json",
-                          "x-csrf-token": 'H6GryH4k',
+                          "x-csrf-token": window.Liferay.authToken,
                           "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                           "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
 
@@ -26,7 +26,7 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
               headers: {
                 accept: "application/json",
                 "Content-Type": "application/json",
-                "x-csrf-token": "H6GryH4k",
+                "x-csrf-token": window.Liferay.authToken,
                 "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                 "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
               },

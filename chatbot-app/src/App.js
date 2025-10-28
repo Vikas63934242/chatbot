@@ -43,7 +43,7 @@ function App() {
               headers: {
                 'accept': 'application/json',
                 "Content-Type": "application/json",
-                'x-csrf-token': 'Ti8Speiv',
+                'x-csrf-token': window.Liferay.authToken,
                 "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                 "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
 
@@ -70,7 +70,7 @@ function App() {
           method: 'DELETE',
           headers: {
             'accept': 'application/json',
-            'x-csrf-token': 't47acYb6',
+            'x-csrf-token': window.Liferay.authToken,
             "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
             "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
 
@@ -99,7 +99,7 @@ function App() {
             method: "GET",
             headers: {
               accept: "application/json",
-              "x-csrf-token": 'hgUi2GwN',
+              "x-csrf-token": window.Liferay.authToken,
               "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
               "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
 
@@ -139,7 +139,7 @@ function App() {
                 method: "GET",
                 headers: {
                   accept: "application/json",
-                  "x-csrf-token": 'hgUi2GwN',
+                  "x-csrf-token": window.Liferay.authToken,
                   "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                   "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
 
@@ -175,7 +175,7 @@ function App() {
                         headers: {
                           "accept": "application/json",
                           "Content-Type": "application/json",
-                          "x-csrf-token": "H6GryH4k",
+                          "x-csrf-token": window.Liferay.authToken,
                           "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                           "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
                         },
@@ -208,7 +208,7 @@ function App() {
               headers: {
                 accept: "application/json",
                 "Content-Type": "application/json",
-                "x-csrf-token": "qbICt4KO",
+                "x-csrf-token": window.Liferay.authToken,
                 "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
                 "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
               },
@@ -283,15 +283,13 @@ function App() {
     const idArray = (items && items.length > 0)
       ? items.map(item => ({ id: item.id }))
       : [];
-    console.log("idArray to delete messages:", idArray);
     deleteChatMessages(idArray);
-    if(chats.length === 0){
-        setSelectedChat(null);
-    }
-    console.log("selectedChat", selectedChat);
     sessionStorage.clear();
     const updatedChats = chats.filter(chat => chat.chatId !== chatId);
     setChats(updatedChats);
+    if(selectedChat && selectedChat.chatId === chatId){
+        setSelectedChat(null);
+    }
   };
 
  const handleSend = async (input, resetInput) => {
