@@ -46,8 +46,8 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     padding: "16px 24px",
-    borderBottom: "1px solid #e0e0e0",
-    backgroundColor: "#ffffff",
+    borderBottom: "1px solid #E5E5E5",
+    backgroundColor: "#FFFFFF",
   },
   leftSection: {
     display: "flex",
@@ -71,7 +71,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0984e3",
+    backgroundColor: "#006D77",
     color: "white",
     fontSize: "18px",
     fontWeight: "600",
@@ -80,7 +80,7 @@ const styles = {
     margin: 0,
     fontSize: "20px",
     fontWeight: "600",
-    color: "#2d3436",
+    color: "#2D3436",
   },
   rightSection: {
     display: "flex",
@@ -88,8 +88,8 @@ const styles = {
     gap: "12px",
   },
   betaBadge: {
-    backgroundColor: "#d63031",
-    color: "white",
+    backgroundColor: "#F5A623",
+    color: "#FFFFFF",
     padding: "4px 12px",
     borderRadius: "4px",
     fontSize: "12px",
@@ -104,7 +104,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#636e72",
+    color: "#636E72",
     transition: "color 0.2s",
   },
 };

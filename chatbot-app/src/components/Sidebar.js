@@ -36,8 +36,8 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, se
         {[...todayChats].reverse().map((chat, i) => (
           <div key={i} style={{
                                                                   ...styles.chatItem,
-                                                                  background: chat.chatId === selectedChat.chatId ? "#1e90ff" : "#57606f",
-                                                                  color: chat.chatId === selectedChat.chatId ? "white" : "white",
+                                                                  background: chat.chatId === selectedChat.chatId ? "#0099A8" : "#004372",
+                                                                  color: chat.chatId === selectedChat.chatId ? "#FFFFFF" : "#FFFFFF",
                                                                 }} >
             {editChat === chat.chatId ? (
               <>
@@ -70,8 +70,8 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, se
         {[...olderChats].reverse().map((chat, i) => (
           <div key={i} style={{
                                      ...styles.chatItem,
-                                     background: chat.chatId === selectedChat.chatId ? "#1e90ff" : "#57606f",
-                                     color: chat.chatId === selectedChat.chatId ? "white" : "white",
+                                     background: chat.chatId === selectedChat.chatId ? "#0099A8" : "#004372",
+                                     color: chat.chatId === selectedChat.chatId ? "#FFFFFF" : "#FFFFFF",
                                    }}>
             {editChat === chat.chatId ? (
               <>
@@ -106,15 +106,15 @@ function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, se
 const styles = {
   sidebar: {
     width: "250px",
-    background: "#2f3542",
-    color: "white",
+    background: "#002E5B",
+    color: "#FFFFFF",
     padding: "20px",
     display: "flex",
     flexDirection: "column",
   },
   newChatBtn: {
-    background: "#1e90ff",
-    color: "white",
+    background: "#0099A8",
+    color: "#FFFFFF",
     border: "none",
     padding: "10px",
     borderRadius: "5px",
@@ -128,7 +128,7 @@ const styles = {
   chatItem: {
     padding: "10px",
     marginBottom: "10px",
-    background: "#57606f",
+    background: "#004372",
     borderRadius: "5px",
     cursor: "pointer",
     display: "flex",
@@ -138,7 +138,7 @@ const styles = {
   iconBtn: {
     background: "none",
     border: "none",
-    color: "white",
+    color: "#FFFFFF",
     cursor: "pointer",
     fontSize: "18px",
   },
@@ -146,7 +146,7 @@ const styles = {
     flex: 1,
     padding: "5px",
     borderRadius: "3px",
-    border: "1px solid #ccc",
+    border: "1px solid #E0E4E9",
   },
 };
 
