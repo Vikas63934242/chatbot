@@ -116,6 +116,7 @@ function ChatWindow({ selectedChat, onSend, isLoading, isChatLoading }) {
         onClose={() => setFeedbackModal({ isOpen: false, type: null, id: null })}
         feedbackType={feedbackModal.type}
         msgId={feedbackModal.id}
+        selectedChat={selectedChat}
       />
     </div>
   );

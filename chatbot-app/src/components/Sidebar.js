@@ -3,7 +3,6 @@ import { useState } from "react";
 import Loader from "./Loader";
 
 function Sidebar({ chats, onNewChat, onSelectChat,  onEditChat, onDeleteChat, selectedChat, isLoading }) {
- console.log({chats});
   const [editChat, setEditChat] = useState(null);
   const [editValue, setEditValue] = useState("");
     const isToday = (date) => {

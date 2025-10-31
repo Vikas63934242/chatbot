@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import Loader from "./Loader";
 import { useLoader } from "../hooks/useLoader";
 
-function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
+function FeedbackModal({ isOpen, onClose, feedbackType, msgId, selectedChat }) {
   const [feedbackText, setFeedbackText] = useState("");
   const feedbackLoader = useLoader();
+  let newMessages = selectedChat.messages;
+  const index = newMessages.findIndex(m => m.id === msgId);
+  const previousMsg = index > 0 ? newMessages[index - 1] : "";
 
   if (!isOpen) return null;
 
@@ -47,9 +50,28 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId }) {
                createdAt: data.createdAt
               })
             });
+            const chatHistory = [{"user" : previousMsg.text},
+                                    {"bot" : data.messageText}];
+              const reqBody = {
+                    user_name: window.themeDisplay.getUserName(),
+                    feedback_flag: feedbackType,
+                    feedback: feedbackText,
+                    chat_history: chatHistory
+                   }
+              await fetch(
+                 'https://4643b175b9e7.ngrok-free.app/api/store-feedback',
+                 {
+                   method: 'POST',
+                   headers: {
+                     'Content-Type': 'application/json',
+                   },
+                   body: JSON.stringify(reqBody),
+                 }
+               );
           } catch (err) {
             console.error("Error creating user-chat mapping:", err);
           }
+
       setFeedbackText("");
       onClose();
     });

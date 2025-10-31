@@ -115,7 +115,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
             },
           }
         );
-            console.log("Response :", response);
         if (!response.ok) {
           const errText = await response.text();
           throw new Error(`Error ${response.status}: ${errText}`);
@@ -126,7 +125,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
         // Extract id from the first item if any
         if (data.items && data.items.length > 0 && field === "chatId") {
           const id = data.items[0].id;
-          console.log("Mapping id:", id);
           return id;
         } else if(data.items.length > 0 && field === "r_userIdChat_userId") {
           return data.items;
@@ -155,7 +153,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
                 },
               }
             );
-                console.log("Response :", response);
             if (!response.ok) {
               const errText = await response.text();
               throw new Error(`Error ${response.status}: ${errText}`);
@@ -165,7 +162,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
 
             // Extract id from the first item if any
             if(data.items.length > 0) {
-               console.log("Mapping data:", data.items);
               return data.items;
             }else {
                 console.log("No mapping found for chat id ", value);
@@ -202,7 +198,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
                          })
                   });
               const data = await response.json();
-              console.log("Added message ID:", data.id);
               return data.id;
         }catch (error) {
             console.error("Error fetching in chatMessage:", error);
@@ -237,7 +232,7 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
     await newChatLoader.withLoader(async () => {
       const chatId = userId+'-'+ Math.random().toString(36).substring(2, 15);
       let newChat = {
-        title: chatId,
+        title: "New Chat",
         chatId: chatId,
         messages: [],
         createdAt: new Date().toISOString(),
@@ -299,7 +294,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
       const idArray = (items && items.length > 0)
         ? items.map(item => ({ id: item.id }))
         : [];
-      console.log("idArray to delete messages:", idArray);
       deleteChatMessages(idArray);
       sessionStorage.clear();
       const updatedChats = chats.filter(chat => chat.chatId !== chatId);
@@ -307,7 +301,6 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
       if(selectedChat && selectedChat.chatId === chatId){
           setSelectedChat(null);
       }
-      console.log("selectedChat", selectedChat);
     });
   };
 
@@ -315,11 +308,40 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
    if (!input.trim() || selectedChat === null) return;
    await sendMessageLoader.withLoader(async () => {
      let userMessageId = await addMessageIntoObject("user", input, selectedChat.chatId);
-     let botMessageId = await addMessageIntoObject("bot", "test response from API", selectedChat.chatId);
-     const newMessages = [
+     let messages = [];
+     let newMessages = [
+         ...selectedChat.messages,
+         { sender: "user", text: input, id: userMessageId }
+       ];
+     if (newMessages.length > 7) {
+       messages = newMessages.slice(-7);
+     }else{
+         messages = newMessages;
+     }
+     const formattedMessages = messages.map(msg => ({
+       [msg.sender]: msg.text
+     }));
+     const reqBody = {
+      chat_history: formattedMessages,
+      user_name: window.themeDisplay.getUserName()
+     }
+     const apiResponse = await fetch(
+       'https://4643b175b9e7.ngrok-free.app/api/chat',
+       {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(reqBody),
+       }
+     );
+
+     const data = await apiResponse.json();
+     let botMessageId = await addMessageIntoObject("bot", data.answer, selectedChat.chatId);
+     newMessages = [
        ...selectedChat.messages,
        { sender: "user", text: input, id: userMessageId },
-       { sender: "bot", text: "test response from API", id: botMessageId }
+       { sender: "bot", text: data.answer, id: botMessageId }
      ];
      const updatedChat = { ...selectedChat, messages: newMessages };
      const updatedChats = chats.map(chat =>
