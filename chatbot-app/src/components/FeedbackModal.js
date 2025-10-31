@@ -15,27 +15,22 @@ function FeedbackModal({ isOpen, onClose, feedbackType, msgId, selectedChat }) {
     await feedbackLoader.withLoader(async () => {
         try {
             const response = await fetch(
-                        `http://localhost:8080/o/c/chatmessages/${msgId}`,
+                        `/o/c/chatmessages/${msgId}`,
                       {
                         method: "GET",
                         headers: {
                           accept: "application/json",
-                          "x-csrf-token": window.Liferay.authToken,
-                          "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                          "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
-
+                          "x-csrf-token": window.Liferay.authToken
                         },
                       }
                     );
             const data = await response.json();
-            await fetch(`http://localhost:8080/o/c/chatmessages/${msgId}`,  {
+            await fetch(`/o/c/chatmessages/${msgId}`,  {
               method: "PUT",
               headers: {
                 accept: "application/json",
                 "Content-Type": "application/json",
-                "x-csrf-token": window.Liferay.authToken,
-                "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
+                "x-csrf-token": window.Liferay.authToken
               },
               body: JSON.stringify({
                chatID: data.chatID,

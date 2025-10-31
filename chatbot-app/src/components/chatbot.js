@@ -47,15 +47,12 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
 
     async function deleteChatMessages(items) {
         try {
-            const response = await fetch(`http://localhost:8080/o/c/chatmessages/batch`, {
+            const response = await fetch(`/o/c/chatmessages/batch`, {
               method: 'DELETE',
               headers: {
                 'accept': 'application/json',
                 "Content-Type": "application/json",
-                'x-csrf-token': window.Liferay.authToken,
-                "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
-
+                'x-csrf-token': window.Liferay.authToken
               },
                body: JSON.stringify(items)
             });
@@ -75,14 +72,11 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
     }
     async function deleteUserChatMapping(mappingId) {
       try {
-        const response = await fetch(`http://localhost:8080/o/c/userandchatidmappings/${mappingId}`, {
+        const response = await fetch(`/o/c/userandchatidmappings/${mappingId}`, {
           method: 'DELETE',
           headers: {
             'accept': 'application/json',
-            'x-csrf-token': window.Liferay.authToken,
-            "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-            "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
-
+            'x-csrf-token': window.Liferay.authToken
           },
         });
 
@@ -103,15 +97,12 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
     async function getUserChatMappingByChatId(field, value) {
       try {
         const response = await fetch(
-            `http://localhost:8080/o/c/userandchatidmappings/?filter=${field} eq '${value}'`,
+            `/o/c/userandchatidmappings/?filter=${field} eq '${value}'`,
           {
             method: "GET",
             headers: {
               accept: "application/json",
-              "x-csrf-token": window.Liferay.authToken,
-              "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-              "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
-
+              "x-csrf-token": window.Liferay.authToken
             },
           }
         );
@@ -141,15 +132,12 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
     async function getChatMessage(value) {
           try {
             const response = await fetch(
-                `http://localhost:8080/o/c/chatmessages/?filter=chatID eq '${value}'`,
+                `/o/c/chatmessages/?filter=chatID eq '${value}'`,
               {
                 method: "GET",
                 headers: {
                   accept: "application/json",
-                  "x-csrf-token": window.Liferay.authToken,
-                  "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                  "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
-
+                  "x-csrf-token": window.Liferay.authToken
                 },
               }
             );
@@ -175,14 +163,12 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
 
     async function addMessageIntoObject(messageType, input, chatId) {
         try {
-              const response = await fetch("http://localhost:8080/o/c/chatmessages/", {
+              const response = await fetch("/o/c/chatmessages/", {
                         method: "POST",
                         headers: {
                           "accept": "application/json",
                           "Content-Type": "application/json",
-                          "x-csrf-token": window.Liferay.authToken,
-                          "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                          "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
+                          "x-csrf-token": window.Liferay.authToken
                         },
                         body: JSON.stringify({
                            chatID: chatId,
@@ -207,14 +193,12 @@ function Chatbot({isFullScreen,setIsFullScreen, setIsOpen, hideSidebar}) {
 
      const createUserChatMapping = async (newChat, id, method) => {
     try {
-            await fetch(`http://localhost:8080/o/c/userandchatidmappings/${id}`,  {
+            await fetch(`/o/c/userandchatidmappings/${id}`,  {
               method: method,
               headers: {
                 accept: "application/json",
                 "Content-Type": "application/json",
-                "x-csrf-token": window.Liferay.authToken,
-                "Authorization": "Basic dGVzdEBnbWFpbC5jb206dGVzdDE=",
-                "Cookie": "COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en_US; JSESSIONID=650FDE5C5D48296107F43573BB51DC3C"
+                "x-csrf-token": window.Liferay.authToken
               },
               body: JSON.stringify({
                 chatId: newChat.chatId,
@@ -393,7 +377,7 @@ const styles = {
   appContainer: {
     display: "flex",
     flexDirection: "column",
-    height: "100vh",
+    height: "100%",
   },
   container: {
     display: "flex",
